@@ -1,2 +1,2 @@
 # FPA
-Fortgeschrittene Programmier Architektur
+Fortgeschrittene Programmier Architekturkonzepte
