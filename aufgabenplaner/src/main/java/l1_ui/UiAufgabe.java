@@ -6,6 +6,7 @@ package l1_ui;
 
 import l4_dm.DmAufgabe;
 import l4_dm.DmVorhaben;
+import multex.Exc;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -15,7 +16,6 @@ import java.util.List;
 
 public class UiAufgabe extends JDialog {
 
-    // protected final int width = 50;
     protected final JLabel id = new JLabel("ID:");
     protected final JTextField idfield = new JTextField("");
 
@@ -26,7 +26,7 @@ public class UiAufgabe extends JDialog {
     protected final JTextArea descrarea = new JTextArea("");
 
     protected final JLabel plan = new JLabel("Teil von Vorhaben:");
-    protected final JComboBox planbox = new JComboBox();
+    protected final JComboBox<DmVorhaben> planbox;
 
     protected final JLabel resth = new JLabel("Rest Stunden zu arbeiten:");
     protected final JTextField resthfield = new JTextField("");
@@ -36,9 +36,6 @@ public class UiAufgabe extends JDialog {
 
     protected final JLabel status = new JLabel("Status:");
     protected final JTextField statusfield = new JTextField("");
-
-    protected final JButton changebtn = new JButton("Ändern");
-    protected final JButton capturebtn = new JButton("Erfassen");
 
     protected final Container container = this.getContentPane();
     protected final JPanel fieldpanel = new JPanel();
@@ -63,6 +60,7 @@ public class UiAufgabe extends JDialog {
         descrarea.setRows(5);
         fieldpanel.add(plan);
         plan.setAlignmentX(Component.LEFT_ALIGNMENT);
+        planbox = new JComboBox(list.toArray(new DmVorhaben[list.size()]));
         fieldpanel.add(planbox);
         planbox.setAlignmentX(Component.LEFT_ALIGNMENT);
         planbox.setEditable(false);
@@ -80,10 +78,10 @@ public class UiAufgabe extends JDialog {
         statusfield.setAlignmentX(Component.LEFT_ALIGNMENT);
         statusfield.setEditable(false);
 
-        container.add(fieldpanel, BorderLayout.CENTER);
+        btnpnl.add(new JButton(this.saveAction));
+        btnpnl.add(new JButton(this.deleteAction));
 
-        btnpnl.add(capturebtn);
-        btnpnl.add(changebtn);
+        container.add(fieldpanel, BorderLayout.CENTER);
         container.add(btnpnl, BorderLayout.SOUTH);
 
         this.addWindowListener(new WindowAdapter() {
@@ -95,7 +93,24 @@ public class UiAufgabe extends JDialog {
 
         this.pack();
         this.setSize(550, 450);
+        this.setResizable(false);
         this.setVisible(true);
     }
+
+    final Action saveAction = new ExceptionReportingSwingAction("Speichern"){
+        @Override
+        public void actionPerformedWithThrows(final ActionEvent evt) throws Exc {
+            System.out.println("Erfassen Schritt " + titlefield.getText());
+            throw new multex.Exc("Die Aufgabe {0} ist nicht erfasst.", titlefield.getText());
+        }
+    };
+
+    final Action deleteAction = new ExceptionReportingSwingAction("Löschen"){
+        @Override
+        public void actionPerformedWithThrows(final ActionEvent evt) throws Exc {
+            System.out.println("Löschen Schritt " + titlefield.getText());
+            throw new multex.Exc("Die Aufgabe {0} ist nicht gelöscht.", titlefield.getText());
+        }
+    };
 
 }

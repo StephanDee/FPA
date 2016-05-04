@@ -11,6 +11,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.lang.*;
 import java.sql.Date;
+import java.util.Arrays;
 import java.util.List;
 
 public class UiVorhaben extends UiAufgabe {
@@ -18,18 +19,14 @@ public class UiVorhaben extends UiAufgabe {
     private final JLabel edate = new JLabel("End Termin:");
     private final JTextField edatefield = new JTextField("");
 
-    protected UiVorhaben(final DmVorhaben vorhaben, final List<DmVorhaben> list) {
+    private UiVorhaben(final DmVorhaben vorhaben, final List<DmVorhaben> list) {
         super(vorhaben, list);
 
-        this.setTitle("Vorhaben erfassen/ändern");
+        this.setTitle("Vorhaben speichern/löschen");
 
         idfield.setText(String.valueOf(vorhaben.getId()));
         titlefield.setText(vorhaben.getTitel());
         descrarea.setText(vorhaben.getBeschreibung());
-        String[] auswahl = vorhaben.getTeil();
-        for (int i = 0; i < auswahl.length; ++i) {
-            planbox.addItem(auswahl[i]);
-        }
         resthfield.setText(String.valueOf(vorhaben.getRestStunden()));
         resthfield.setEditable(false);
         ishfield.setText(String.valueOf(vorhaben.getIstStunden()));
@@ -41,17 +38,30 @@ public class UiVorhaben extends UiAufgabe {
         fieldpanel.add(edatefield);
         edatefield.setAlignmentX(Component.LEFT_ALIGNMENT);
         edatefield.setText(String.valueOf(vorhaben.getEndTermin()));
-
     }
 
     public static void main(final String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                final DmVorhaben vorhaben = new DmVorhaben();
-                final List<DmVorhaben> list = null;
+                final DmVorhaben vorhaben = new DmVorhaben(){
+                    @Override
+                    public Long getId() {
+                        return 11L;
+                    }
+                };
+                final List<DmVorhaben> list = Arrays.asList(new DmVorhaben() {
+                    @Override
+                    public Long getId() {
+                        return 11L;
+                    }
+
+                    @Override
+                    public final String getTitel() {
+                        return "Persistenzaufgabe lösen";
+                    }
+                });
                 vorhaben.setTitel("Meine große Aufgabe");
                 vorhaben.setBeschreibung("Diese Aufgabe ist groß." + '\n' + "Sie muss dennoch erledigt werden.");
-                vorhaben.setTeil(new String[]{"11 Persistenzaufgabe lösen", "12 Exceptionaufgabe lösen", "13 Datenbankaufgabe lösen"});
                 vorhaben.setRestStunden(7);
                 vorhaben.setIstStunden(0);
                 vorhaben.setStatus(DmAufgabeStatus.neu);
