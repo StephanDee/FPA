@@ -1,13 +1,4 @@
-Persistence.ser
 target/
-aufgabe-DB/
-.settings/
-.idea/
-.classpath
-.project
-derby.log
+.idea
 aufgabenplaner.iml
-<<<<<<< HEAD
-pom.xml
-=======
->>>>>>> 74da0572fbcc8a2acaed68ce2e77eeeaaf7e6561
+derby.log
