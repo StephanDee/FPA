@@ -1,2 +1,5 @@
-Persistence.ser
+.idea
 target/
+out/
+Persistence.ser
+java-excrep.iml
