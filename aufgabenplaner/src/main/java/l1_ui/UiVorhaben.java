@@ -16,10 +16,10 @@ import java.util.List;
 
 public class UiVorhaben extends UiAufgabe {
 
-    private final JLabel edate = new JLabel("End Termin:");
-    private final JTextField edatefield = new JTextField("");
+    protected final JLabel edate = new JLabel("End Termin:");
+    protected final JTextField edatefield = new JTextField("");
 
-    private UiVorhaben(final DmVorhaben vorhaben, final List<DmVorhaben> list) {
+    public UiVorhaben(final DmVorhaben vorhaben, final List<DmVorhaben> list) {
         super(vorhaben, list);
 
         this.setTitle("Vorhaben speichern/löschen");

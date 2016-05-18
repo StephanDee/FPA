@@ -1,9 +1,5 @@
 package l1_ui;
 
-/**
- * Created by Stephan D on 01.05.2016.
- */
-
 import java.awt.event.ActionEvent;
 import java.util.Locale;
 import java.util.ResourceBundle;

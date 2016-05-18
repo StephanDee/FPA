@@ -22,8 +22,8 @@ import java.util.List;
 
 public class UiSchritt extends UiAufgabe {
 
-    private final JLabel done = new JLabel("Erledigt Zeitpunkt:");
-    private final JTextField donefield = new JTextField("");
+    protected final JLabel done = new JLabel("Erledigt Zeitpunkt:");
+    protected final JTextField donefield = new JTextField("");
 
     private UiSchritt(final DmSchritt schritt, final List<DmVorhaben> list) {
         super(schritt, list);
@@ -47,18 +47,18 @@ public class UiSchritt extends UiAufgabe {
 
     }
 
-            final Action todoAction = new ExceptionReportingSwingAction("Erledigen"){
-            @Override
-            public void actionPerformedWithThrows(final ActionEvent evt) throws Exc {
-                System.out.println("Erledigen des Schritts " + titlefield.getText());
-                throw new multex.Exc("Die Aufgabe {0} ist zu schwer.", titlefield.getText());
-            }
-        };
+    final Action todoAction = new ExceptionReportingSwingAction("Erledigen") {
+        @Override
+        public void actionPerformedWithThrows(final ActionEvent evt) throws Exc {
+            System.out.println("Erledigen des Schritts " + titlefield.getText());
+            throw new multex.Exc("Die Aufgabe {0} ist zu schwer.", titlefield.getText());
+        }
+    };
 
     public static void main(final String[] args) {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                final DmSchritt schritt = new DmSchritt(){
+                final DmSchritt schritt = new DmSchritt() {
                     @Override
                     public Long getId() {
                         return 11L;
