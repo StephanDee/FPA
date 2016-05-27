@@ -99,10 +99,11 @@ public class UiAufgabenTabelle extends JDialog {
 
         public TableModel(List<DmAufgabe> aufgabenliste) {
 
-            data = new Object[aufgabenliste.size()][4];
+            final int anzahlSpalten = 4;
+            data = new Object[aufgabenliste.size()][anzahlSpalten];
 
             for (int i = 0; i < aufgabenliste.size(); i++) {
-                final Object[] temp = new Object[4];
+                final Object[] temp = new Object[anzahlSpalten];
                 temp[0] = aufgabenliste.get(i).getId();
                 temp[1] = aufgabenliste.get(i).getTitel();
                 temp[2] = aufgabenliste.get(i).getAnzahlTeile();
