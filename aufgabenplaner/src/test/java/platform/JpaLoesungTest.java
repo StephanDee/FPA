@@ -26,7 +26,7 @@ public class JpaLoesungTest extends Assert {
     }
 
     @Test
-    public void t010() {
+    public void t010_manuelleTransaktion() {
 
         // 1. Entity persistieren in manueller Transaktion mit "transaction-scoped persistence context" ohne Rollback:
         final EMTransaction tx = new EMTransaction();
@@ -56,7 +56,9 @@ public class JpaLoesungTest extends Assert {
     }
 
     @Test
-    public void t020() {
+    public void t020_rollback() {
+
+        //2. Wirkung des rollback ausprobieren:
         final EMTransaction tx = new EMTransaction();
         final EntityManager entityManager = entityManagerFactory.createEntityManager();
         final EntityTransaction transaction = entityManager.getTransaction();
@@ -98,7 +100,9 @@ public class JpaLoesungTest extends Assert {
     }
 
     @Test
-    public void t030() {
+    public void t030_entityMitId() {
+
+        //3. Entity mit id holen und ändern:
         final EMTransaction tx = new EMTransaction();
         final DmSchritt schritt = tx.em.find(DmSchritt.class, 1L);
 
@@ -124,7 +128,9 @@ public class JpaLoesungTest extends Assert {
     }
 
     @Test
-    public void t040() {
+    public void t040_detachMerge() {
+
+        //4. detach und merge prüfen:
         final DmSchritt schritt;
         {
             final EMTransaction tx = new EMTransaction();
@@ -155,7 +161,9 @@ public class JpaLoesungTest extends Assert {
     }
 
     @Test
-    public void t050() {
+    public void t050_entityId() {
+
+        //5. Entity wieder mit id holen und prüfen:
         final EMTransaction tx = new EMTransaction();
         final DmSchritt schritt = tx.em.find(DmSchritt.class, 1L);
 
@@ -169,7 +177,9 @@ public class JpaLoesungTest extends Assert {
     }
 
     @Test
-    public void t060() {
+    public void t060_alleSchritteJPQL() {
+
+        //6. Alle Schritte mit Java Persistence Query Language (JPQL) holen:
         final EMTransaction tx = new EMTransaction();
         //TypedQuery<T> wurde in JPA 2 eingeführt, um den Cast nach T zu vermeiden.
         final TypedQuery<DmSchritt> q = tx.em.createQuery("SELECT o FROM " + DmSchritt.class.getName() + " o ORDER BY id DESC", DmSchritt.class);
@@ -186,7 +196,9 @@ public class JpaLoesungTest extends Assert {
     }
 
     @Test
-    public void t070() {
+    public void t070_entityIdDelete() {
+
+        //7. Entity wieder mit id holen und dann löschen:
         final EMTransaction tx = new EMTransaction();
         final DmSchritt schritt = tx.em.find(DmSchritt.class, 1L);
 
@@ -206,7 +218,9 @@ public class JpaLoesungTest extends Assert {
     }
 
     @Test
-    public void t080() {
+    public void t080_entityDelete() {
+
+        //8. Entity nach Löschen holen:
         final EMTransaction tx = new EMTransaction();
         final DmSchritt schritt = tx.em.find(DmSchritt.class, 1L);
 
