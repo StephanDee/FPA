@@ -5,4 +5,6 @@ package l3_da;
  */
 public class DaGenericImpl {
 
+// Gemeinsamkeiten hier:
+
 }
