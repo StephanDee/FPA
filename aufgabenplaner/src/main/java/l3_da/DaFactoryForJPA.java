@@ -3,13 +3,16 @@ package l3_da;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-
-import static l3_da.DaSchritt.entityManagerFactory;
+import javax.persistence.Persistence;
 
 /**
  * Created by Stephan D on 27.05.2016.
  */
 public class DaFactoryForJPA {
+
+    public final String persistenceUnitName = "aufgabenplaner"; //as specified in src/main/resources/META-INF/persistence.xml
+    //createEntityManagerFactory ist eine sehr aufwändige Operation! Die EntityManagerFactory muss am Ende manuell geschlossen werden!
+    public final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName);
 
     public final EntityManager em = entityManagerFactory.createEntityManager();
 

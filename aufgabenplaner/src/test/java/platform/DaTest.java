@@ -2,6 +2,7 @@ package platform;
 
 import l3_da.DaFactoryForJPA;
 import l4_dm.DmSchritt;
+import l4_dm.DmVorhaben;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
@@ -64,6 +65,48 @@ public class DaTest extends Assert {
 //        assertEquals(dmaufgabestatus<neu>"neu", schritt.getStatus());
         assertEquals(null, schritt.getErledigtZeitpunkt());
         assertEquals(transaction.em.contains(schritt), true);
+
+        transaction.endTransaction(true);
+    }
+
+    @Test
+    public void t020_VorhabenEntityPersist() throws Exception {
+
+        // Entity persistieren
+        final DaFactoryForJPA transaction = new DaFactoryForJPA();
+        final DmVorhaben vorhaben = new DmVorhaben();
+        vorhaben.getId();
+        vorhaben.getTitel();
+        vorhaben.getBeschreibung();
+        vorhaben.getTeile();
+        vorhaben.getIstStunden();
+        vorhaben.getRestStunden();
+        vorhaben.getStatus();
+        vorhaben.getEndTermin();
+
+        //Hierdurch wird schritt zu einer "managed entity":
+        assertEquals(null, vorhaben.getId());
+        assertEquals(null, vorhaben.getTitel());
+        assertEquals(null, vorhaben.getBeschreibung());
+//        assertEquals([], vorhaben.getTeile());
+        assertEquals(-999999, vorhaben.getIstStunden());
+        assertEquals(-999999, vorhaben.getRestStunden());
+//        assertEquals(dmaufgabestatus<neu>"neu", vorhaben.getStatus());
+        assertEquals(null, vorhaben.getEndTermin());
+        assertEquals(transaction.em.contains(vorhaben), false);
+
+        transaction.em.persist(vorhaben);
+
+        // Hierdurch werden alle "managed entities" in die Datenbank geschrieben:
+        assertEquals(new Long(2L), vorhaben.getId());
+        assertEquals(null, vorhaben.getTitel());
+        assertEquals(null, vorhaben.getBeschreibung());
+//        assertEquals([], vorhaben.getTeile());
+        assertEquals(-999999, vorhaben.getIstStunden());
+        assertEquals(-999999, vorhaben.getRestStunden());
+//        assertEquals(dmaufgabestatus<neu>"neu", schritt.getStatus());
+        assertEquals(null, vorhaben.getEndTermin());
+        assertEquals(transaction.em.contains(vorhaben), true);
 
         transaction.endTransaction(true);
     }
