@@ -10,6 +10,6 @@ import javax.persistence.EntityManager;
 public class DaVorhabenImpl extends DaGenericImpl<DmVorhaben> implements DaVorhaben {
 
     public DaVorhabenImpl(EntityManager manager) {
-        super(manager);
+        super(DmVorhaben.class, manager);
     }
 }

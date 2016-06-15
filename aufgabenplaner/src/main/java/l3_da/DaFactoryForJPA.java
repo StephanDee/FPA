@@ -8,7 +8,7 @@ import javax.persistence.Persistence;
 /**
  * Created by Stephan D on 27.05.2016.
  */
-public class DaFactoryForJPA {
+public class DaFactoryForJPA implements DaFactory {
 
     public final String persistenceUnitName = "aufgabenplaner"; //as specified in src/main/resources/META-INF/persistence.xml
     //createEntityManagerFactory ist eine sehr aufwändige Operation! Die EntityManagerFactory muss am Ende manuell geschlossen werden!
@@ -20,12 +20,29 @@ public class DaFactoryForJPA {
         final EntityManagerFactory entityManagerFactory;
     }
 
+    @Override
+    public DaAufgabe getAufgabeDA() {
+        return new DaAufgabeImpl(em);
+    }
+
+    @Override
+    public DaSchritt getSchrittDA() {
+        return new DaSchrittImpl(em);
+    }
+
+    @Override
+    public DaVorhaben getVorhabenDA() {
+        return new DaVorhabenImpl(em);
+    }
+
+    @Override
     public void beginTransaction() {
         final EntityTransaction transaction = em.getTransaction();
 
         transaction.begin();
     }
 
+    @Override
     public void endTransaction(final boolean ok) {
         final EntityTransaction transaction = em.getTransaction();
         try {

@@ -9,11 +9,13 @@ import java.util.List;
 /**
  * Created by Stephan D on 08.06.2016.
  */
-public class DaGenericImpl<E> implements DaGeneric<E> {
+public class DaGenericImpl<E extends DmAufgabe> implements DaGeneric<E> {
 
+    private final Class<E> managedClass;
     private final EntityManager manager;
 
-    public DaGenericImpl(EntityManager manager) {
+    public DaGenericImpl(Class<E> managedClass, EntityManager manager) {
+        this.managedClass = managedClass;
         this.manager = manager;
     }
 
@@ -31,7 +33,7 @@ public class DaGenericImpl<E> implements DaGeneric<E> {
 
     @Override
     public E find(Long id) throws IdNotFoundExc {
-        return ((E) manager.find(DaGeneric.class, id));
+        return (manager.find(managedClass, id));
     }
 
     @Override

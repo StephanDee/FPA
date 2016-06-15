@@ -1,6 +1,7 @@
 package platform;
 
 import l3_da.DaFactoryForJPA;
+import l3_da.DaSchritt;
 import l4_dm.DmSchritt;
 import l4_dm.DmVorhaben;
 import org.junit.Assert;
@@ -28,40 +29,29 @@ public class DaTest extends Assert {
     }
 
     @Test
-    public void t010_SchrittEntityPersist() throws Exception {
-
-        // Entity persistieren
+    public void t001_SaveEntity() throws Exception {
         final DaFactoryForJPA transaction = new DaFactoryForJPA();
-        final DmSchritt schritt = new DmSchritt();
+        final DaSchritt daSchritt = transaction.getSchrittDA();
+        final DmSchritt schritt = daSchritt.find(1L);
         schritt.getId();
-        schritt.getTitel();
-        schritt.getBeschreibung();
-        schritt.getTeile();
-        schritt.getIstStunden();
-        schritt.getRestStunden();
-        schritt.getStatus();
-        schritt.getErledigtZeitpunkt();
+        schritt.setTitel("Mein Aufgabenplaner");
+        schritt.setBeschreibung("Meine Aufgabe");
+//        schritt.getTeile();
+        schritt.setIstStunden(0);
+        schritt.setRestStunden(2);
+//        schritt.getStatus();
+//        schritt.getErledigtZeitpunkt();
 
-        //Hierdurch wird schritt zu einer "managed entity":
-        assertEquals(null, schritt.getId());
-        assertEquals(null, schritt.getTitel());
-        assertEquals(null, schritt.getBeschreibung());
-//        assertEquals([], schritt.getTeile());
-        assertEquals(0, schritt.getIstStunden());
-        assertEquals(0, schritt.getRestStunden());
-//        assertEquals(dmaufgabestatus<neu>"neu", schritt.getStatus());
-        assertEquals(null, schritt.getErledigtZeitpunkt());
-        assertEquals(transaction.em.contains(schritt), false);
-
-        transaction.em.persist(schritt);
+//        transaction.em.persist(schritt);
+        daSchritt.save(schritt);
 
         // Hierdurch werden alle "managed entities" in die Datenbank geschrieben:
         assertEquals(new Long(1L), schritt.getId());
-        assertEquals(null, schritt.getTitel());
-        assertEquals(null, schritt.getBeschreibung());
+        assertEquals("Mein Aufgabenplaner", schritt.getTitel());
+        assertEquals("Meine Aufgabe", schritt.getBeschreibung());
 //        assertEquals([], schritt.getTeile());
         assertEquals(0, schritt.getIstStunden());
-        assertEquals(0, schritt.getRestStunden());
+        assertEquals(2, schritt.getRestStunden());
 //        assertEquals(dmaufgabestatus<neu>"neu", schritt.getStatus());
         assertEquals(null, schritt.getErledigtZeitpunkt());
         assertEquals(transaction.em.contains(schritt), true);
@@ -69,46 +59,88 @@ public class DaTest extends Assert {
         transaction.endTransaction(true);
     }
 
-    @Test
-    public void t020_VorhabenEntityPersist() throws Exception {
-
-        // Entity persistieren
-        final DaFactoryForJPA transaction = new DaFactoryForJPA();
-        final DmVorhaben vorhaben = new DmVorhaben();
-        vorhaben.getId();
-        vorhaben.getTitel();
-        vorhaben.getBeschreibung();
-        vorhaben.getTeile();
-        vorhaben.getIstStunden();
-        vorhaben.getRestStunden();
-        vorhaben.getStatus();
-        vorhaben.getEndTermin();
-
-        //Hierdurch wird schritt zu einer "managed entity":
-        assertEquals(null, vorhaben.getId());
-        assertEquals(null, vorhaben.getTitel());
-        assertEquals(null, vorhaben.getBeschreibung());
-//        assertEquals([], vorhaben.getTeile());
-        assertEquals(-999999, vorhaben.getIstStunden());
-        assertEquals(-999999, vorhaben.getRestStunden());
-//        assertEquals(dmaufgabestatus<neu>"neu", vorhaben.getStatus());
-        assertEquals(null, vorhaben.getEndTermin());
-        assertEquals(transaction.em.contains(vorhaben), false);
-
-        transaction.em.persist(vorhaben);
-
-        // Hierdurch werden alle "managed entities" in die Datenbank geschrieben:
-        assertEquals(new Long(2L), vorhaben.getId());
-        assertEquals(null, vorhaben.getTitel());
-        assertEquals(null, vorhaben.getBeschreibung());
-//        assertEquals([], vorhaben.getTeile());
-        assertEquals(-999999, vorhaben.getIstStunden());
-        assertEquals(-999999, vorhaben.getRestStunden());
-//        assertEquals(dmaufgabestatus<neu>"neu", schritt.getStatus());
-        assertEquals(null, vorhaben.getEndTermin());
-        assertEquals(transaction.em.contains(vorhaben), true);
-
-        transaction.endTransaction(true);
-    }
+//    @Test
+//    public void t010_SchrittEntityPersist() throws Exception {
+//
+//        // Entity persistieren
+//        final DaFactoryForJPA transaction = new DaFactoryForJPA();
+//        final DmSchritt schritt = new DmSchritt();
+//        schritt.getId();
+//        schritt.getTitel();
+//        schritt.getBeschreibung();
+//        schritt.getTeile();
+//        schritt.getIstStunden();
+//        schritt.getRestStunden();
+//        schritt.getStatus();
+//        schritt.getErledigtZeitpunkt();
+//
+//        //Hierdurch wird schritt zu einer "managed entity":
+//        assertEquals(null, schritt.getId());
+//        assertEquals(null, schritt.getTitel());
+//        assertEquals(null, schritt.getBeschreibung());
+////        assertEquals([], schritt.getTeile());
+//        assertEquals(0, schritt.getIstStunden());
+//        assertEquals(0, schritt.getRestStunden());
+////        assertEquals(dmaufgabestatus<neu>"neu", schritt.getStatus());
+//        assertEquals(null, schritt.getErledigtZeitpunkt());
+//        assertEquals(transaction.em.contains(schritt), false);
+//
+//        transaction.em.persist(schritt);
+//
+//        // Hierdurch werden alle "managed entities" in die Datenbank geschrieben:
+//        assertEquals(new Long(1L), schritt.getId());
+//        assertEquals(null, schritt.getTitel());
+//        assertEquals(null, schritt.getBeschreibung());
+////        assertEquals([], schritt.getTeile());
+//        assertEquals(0, schritt.getIstStunden());
+//        assertEquals(0, schritt.getRestStunden());
+////        assertEquals(dmaufgabestatus<neu>"neu", schritt.getStatus());
+//        assertEquals(null, schritt.getErledigtZeitpunkt());
+//        assertEquals(transaction.em.contains(schritt), true);
+//
+//        transaction.endTransaction(true);
+//    }
+//
+//    @Test
+//    public void t020_VorhabenEntityPersist() throws Exception {
+//
+//        // Entity persistieren
+//        final DaFactoryForJPA transaction = new DaFactoryForJPA();
+//        final DmVorhaben vorhaben = new DmVorhaben();
+//        vorhaben.getId();
+//        vorhaben.getTitel();
+//        vorhaben.getBeschreibung();
+//        vorhaben.getTeile();
+//        vorhaben.getIstStunden();
+//        vorhaben.getRestStunden();
+//        vorhaben.getStatus();
+//        vorhaben.getEndTermin();
+//
+//        //Hierdurch wird schritt zu einer "managed entity":
+//        assertEquals(null, vorhaben.getId());
+//        assertEquals(null, vorhaben.getTitel());
+//        assertEquals(null, vorhaben.getBeschreibung());
+////        assertEquals([], vorhaben.getTeile());
+//        assertEquals(-999999, vorhaben.getIstStunden());
+//        assertEquals(-999999, vorhaben.getRestStunden());
+////        assertEquals(dmaufgabestatus<neu>"neu", vorhaben.getStatus());
+//        assertEquals(null, vorhaben.getEndTermin());
+//        assertEquals(transaction.em.contains(vorhaben), false);
+//
+//        transaction.em.persist(vorhaben);
+//
+//        // Hierdurch werden alle "managed entities" in die Datenbank geschrieben:
+//        assertEquals(new Long(2L), vorhaben.getId());
+//        assertEquals(null, vorhaben.getTitel());
+//        assertEquals(null, vorhaben.getBeschreibung());
+////        assertEquals([], vorhaben.getTeile());
+//        assertEquals(-999999, vorhaben.getIstStunden());
+//        assertEquals(-999999, vorhaben.getRestStunden());
+////        assertEquals(dmaufgabestatus<neu>"neu", schritt.getStatus());
+//        assertEquals(null, vorhaben.getEndTermin());
+//        assertEquals(transaction.em.contains(vorhaben), true);
+//
+//        transaction.endTransaction(true);
+//    }
 
 }
