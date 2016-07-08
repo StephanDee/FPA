@@ -3,7 +3,7 @@ package l3_da;
 import l4_dm.DmAufgabe;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
 /**
@@ -21,9 +21,13 @@ public class DaGenericImpl<E extends DmAufgabe> implements DaGeneric<E> {
 
     @Override
     public boolean save(E entity) {
-        manager.persist(entity);
-        manager.flush();
-        return true;
+        if (entity.getId() == null) {
+            manager.persist(entity);
+            return true;
+        } else {
+            manager.merge(entity);
+            return false;
+        }
     }
 
     @Override
@@ -38,8 +42,8 @@ public class DaGenericImpl<E extends DmAufgabe> implements DaGeneric<E> {
 
     @Override
     public List<E> findAll() {
-        Query query = manager.createQuery("Select All");
-        return (List<E>) query.getResultList();
+        final TypedQuery<E> query = manager.createQuery("Find All", this.managedClass);
+        return query.getResultList();
     }
 
     // Ab hier Zusatzaufgaben.

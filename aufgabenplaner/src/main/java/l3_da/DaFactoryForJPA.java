@@ -55,6 +55,5 @@ public class DaFactoryForJPA implements DaFactory {
         } finally { //wird auch bei Erfolg oder return ausgeführt!
             em.close();
         }
-        em.clear();
     }
 }

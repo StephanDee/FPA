@@ -1,146 +1,199 @@
 package platform;
 
+import l3_da.DaFactory;
 import l3_da.DaFactoryForJPA;
 import l3_da.DaSchritt;
+import l3_da.DaVorhaben;
+import l4_dm.DmAufgabeStatus;
 import l4_dm.DmSchritt;
 import l4_dm.DmVorhaben;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import javax.persistence.*;
+import java.util.Collections;
 
 /**
  * Created by Stephan D on 06.06.2016.
  */
-
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class DaTest extends Assert {
 
-    private static final String persistenceUnitName = "aufgabenplaner"; //as specified in src/main/resources/META-INF/persistence.xml
-    //createEntityManagerFactory ist eine sehr aufwändige Operation! Die EntityManagerFactory muss am Ende manuell geschlossen werden!
-    private static EntityManagerFactory entityManagerFactory;
+    private static final DaFactory daFactory = new DaFactoryForJPA();
 
-    @BeforeClass
-    public static void setupClass() {
-        entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnitName);
+    @Test
+    public void t010_SaveEntitySchritt() throws Exception {
+
+        // Entity Schritt speichern
+        final DaSchritt daSchritt = daFactory.getSchrittDA();
+        assertNull(daSchritt.find(1L));
+        final DmSchritt schritt = new DmSchritt();
+        schritt.setTitel("Mein Aufgabenplaner");
+        schritt.setBeschreibung("Meine Aufgabe");
+        schritt.getTeile();
+        schritt.setIstStunden(0);
+        schritt.setRestStunden(2);
+        schritt.getStatus();
+        schritt.getErledigtZeitpunkt();
+
+        daFactory.beginTransaction();
+        daSchritt.save(schritt);
+        daFactory.endTransaction(true);
+
+        // Entity Schritt im Round-Trip-Verfahren lesen und prüfen
+        final DaFactory daFactory2 = new DaFactoryForJPA();
+        final DaSchritt daSchritt2 = daFactory2.getSchrittDA();
+        final DmSchritt schritt2 = daSchritt2.find(1L);
+
+        daFactory2.beginTransaction();
+
+        assertEquals(new Long(1L), schritt2.getId());
+        assertEquals("Mein Aufgabenplaner", schritt2.getTitel());
+        assertEquals("Meine Aufgabe", schritt2.getBeschreibung());
+        assertEquals(Collections.emptyList(), schritt2.getTeile());
+        assertEquals(0, schritt2.getIstStunden());
+        assertEquals(2, schritt2.getRestStunden());
+        assertEquals(DmAufgabeStatus.valueOf("inBearbeitung"), schritt2.getStatus());
+        assertEquals(null, schritt2.getErledigtZeitpunkt());
+
+        daFactory2.endTransaction(true);
+
     }
 
     @Test
-    public void t001_SaveEntity() throws Exception {
-        final DaFactoryForJPA transaction = new DaFactoryForJPA();
-        final DaSchritt daSchritt = transaction.getSchrittDA();
+    public void t020_MergeEntitySchritt() throws Exception {
+
+        // Entity Schritt mergen
+        final DaFactory daFactory = new DaFactoryForJPA();
+        final DaSchritt daSchritt = daFactory.getSchrittDA();
         final DmSchritt schritt = daSchritt.find(1L);
-        schritt.getId();
-        schritt.setTitel("Mein Aufgabenplaner");
-        schritt.setBeschreibung("Meine Aufgabe");
-//        schritt.getTeile();
-        schritt.setIstStunden(0);
-        schritt.setRestStunden(2);
-//        schritt.getStatus();
-//        schritt.getErledigtZeitpunkt();
+        schritt.setTitel("Mein erster Aufgabenplaner");
+        schritt.setBeschreibung("Meine erste Aufgabe");
+        schritt.getTeile();
+        schritt.setIstStunden(1);
+        schritt.setRestStunden(4);
+        schritt.getStatus();
+        schritt.getErledigtZeitpunkt();
 
-//        transaction.em.persist(schritt);
+        daFactory.beginTransaction();
         daSchritt.save(schritt);
+        daFactory.endTransaction(true);
 
-        // Hierdurch werden alle "managed entities" in die Datenbank geschrieben:
-        assertEquals(new Long(1L), schritt.getId());
-        assertEquals("Mein Aufgabenplaner", schritt.getTitel());
-        assertEquals("Meine Aufgabe", schritt.getBeschreibung());
-//        assertEquals([], schritt.getTeile());
-        assertEquals(0, schritt.getIstStunden());
-        assertEquals(2, schritt.getRestStunden());
-//        assertEquals(dmaufgabestatus<neu>"neu", schritt.getStatus());
-        assertEquals(null, schritt.getErledigtZeitpunkt());
-        assertEquals(transaction.em.contains(schritt), true);
+        // Entity Schritt im Round-Trip-Verfahren lesen und prüfen
+        final DaFactory daFactory2 = new DaFactoryForJPA();
+        final DaSchritt daSchritt2 = daFactory2.getSchrittDA();
+        final DmSchritt schritt2 = daSchritt2.find(1L);
 
-        transaction.endTransaction(true);
+        daFactory2.beginTransaction();
+
+        assertEquals(new Long(1L), schritt2.getId());
+        assertEquals("Mein erster Aufgabenplaner", schritt2.getTitel());
+        assertEquals("Meine erste Aufgabe", schritt2.getBeschreibung());
+        assertEquals(Collections.emptyList(), schritt2.getTeile());
+        assertEquals(1, schritt2.getIstStunden());
+        assertEquals(4, schritt2.getRestStunden());
+        assertEquals(DmAufgabeStatus.valueOf("inBearbeitung"), schritt2.getStatus());
+        assertEquals(null, schritt2.getErledigtZeitpunkt());
+
+        daFactory2.endTransaction(true);
     }
 
-//    @Test
-//    public void t010_SchrittEntityPersist() throws Exception {
-//
-//        // Entity persistieren
-//        final DaFactoryForJPA transaction = new DaFactoryForJPA();
-//        final DmSchritt schritt = new DmSchritt();
-//        schritt.getId();
-//        schritt.getTitel();
-//        schritt.getBeschreibung();
-//        schritt.getTeile();
-//        schritt.getIstStunden();
-//        schritt.getRestStunden();
-//        schritt.getStatus();
-//        schritt.getErledigtZeitpunkt();
-//
-//        //Hierdurch wird schritt zu einer "managed entity":
-//        assertEquals(null, schritt.getId());
-//        assertEquals(null, schritt.getTitel());
-//        assertEquals(null, schritt.getBeschreibung());
-////        assertEquals([], schritt.getTeile());
-//        assertEquals(0, schritt.getIstStunden());
-//        assertEquals(0, schritt.getRestStunden());
-////        assertEquals(dmaufgabestatus<neu>"neu", schritt.getStatus());
-//        assertEquals(null, schritt.getErledigtZeitpunkt());
-//        assertEquals(transaction.em.contains(schritt), false);
-//
-//        transaction.em.persist(schritt);
-//
-//        // Hierdurch werden alle "managed entities" in die Datenbank geschrieben:
-//        assertEquals(new Long(1L), schritt.getId());
-//        assertEquals(null, schritt.getTitel());
-//        assertEquals(null, schritt.getBeschreibung());
-////        assertEquals([], schritt.getTeile());
-//        assertEquals(0, schritt.getIstStunden());
-//        assertEquals(0, schritt.getRestStunden());
-////        assertEquals(dmaufgabestatus<neu>"neu", schritt.getStatus());
-//        assertEquals(null, schritt.getErledigtZeitpunkt());
-//        assertEquals(transaction.em.contains(schritt), true);
-//
-//        transaction.endTransaction(true);
-//    }
-//
-//    @Test
-//    public void t020_VorhabenEntityPersist() throws Exception {
-//
-//        // Entity persistieren
-//        final DaFactoryForJPA transaction = new DaFactoryForJPA();
-//        final DmVorhaben vorhaben = new DmVorhaben();
-//        vorhaben.getId();
-//        vorhaben.getTitel();
-//        vorhaben.getBeschreibung();
-//        vorhaben.getTeile();
-//        vorhaben.getIstStunden();
-//        vorhaben.getRestStunden();
-//        vorhaben.getStatus();
-//        vorhaben.getEndTermin();
-//
-//        //Hierdurch wird schritt zu einer "managed entity":
-//        assertEquals(null, vorhaben.getId());
-//        assertEquals(null, vorhaben.getTitel());
-//        assertEquals(null, vorhaben.getBeschreibung());
-////        assertEquals([], vorhaben.getTeile());
-//        assertEquals(-999999, vorhaben.getIstStunden());
-//        assertEquals(-999999, vorhaben.getRestStunden());
-////        assertEquals(dmaufgabestatus<neu>"neu", vorhaben.getStatus());
-//        assertEquals(null, vorhaben.getEndTermin());
-//        assertEquals(transaction.em.contains(vorhaben), false);
-//
-//        transaction.em.persist(vorhaben);
-//
-//        // Hierdurch werden alle "managed entities" in die Datenbank geschrieben:
-//        assertEquals(new Long(2L), vorhaben.getId());
-//        assertEquals(null, vorhaben.getTitel());
-//        assertEquals(null, vorhaben.getBeschreibung());
-////        assertEquals([], vorhaben.getTeile());
-//        assertEquals(-999999, vorhaben.getIstStunden());
-//        assertEquals(-999999, vorhaben.getRestStunden());
-////        assertEquals(dmaufgabestatus<neu>"neu", schritt.getStatus());
-//        assertEquals(null, vorhaben.getEndTermin());
-//        assertEquals(transaction.em.contains(vorhaben), true);
-//
-//        transaction.endTransaction(true);
-//    }
+    @Test
+    public void t030_DeleteEntitySchritt() throws Exception {
+
+        // Entity Schritt löschen
+        final DaFactory daFactory = new DaFactoryForJPA();
+        final DaSchritt daSchritt = daFactory.getSchrittDA();
+        final DmSchritt schritt = daSchritt.find(1L);
+
+        daFactory.beginTransaction();
+        daSchritt.delete(schritt);
+        daFactory.endTransaction(true);
+
+        // Entity Schritt im Round-Trip-Verfahren lesen und prüfen
+        final DaFactory daFactory2 = new DaFactoryForJPA();
+        final DaSchritt daSchritt2 = daFactory2.getSchrittDA();
+        final DmSchritt schritt2 = daSchritt2.find(1L);
+
+        daFactory2.beginTransaction();
+
+        assertEquals(null, schritt2);
+
+        daFactory2.endTransaction(true);
+
+    }
+
+    @Test
+    public void t040_SaveEntityVorhaben() throws Exception {
+
+        // Entity Vorhaben speichern
+        final DaFactory daFactory = new DaFactoryForJPA();
+        final DaVorhaben daVorhaben = daFactory.getVorhabenDA();
+        final DmVorhaben vorhaben = new DmVorhaben();
+        vorhaben.setTitel("Mein zweiter Aufgabenplaner");
+        vorhaben.setBeschreibung("Meine zweite Aufgabe");
+        vorhaben.getTeile();
+        vorhaben.setIstStunden(-999999);
+        vorhaben.setRestStunden(-999999);
+        vorhaben.getEndTermin();
+
+        daFactory.beginTransaction();
+        daVorhaben.save(vorhaben);
+        daFactory.endTransaction(true);
+
+        final Long savedId = vorhaben.getId();
+
+        // Entity Vorhaben im Round-Trip-Verfahren lesen und prüfen
+        final DaFactory daFactory2 = new DaFactoryForJPA();
+        final DaVorhaben daVorhaben2 = daFactory2.getVorhabenDA();
+        final DmVorhaben vorhaben2 = daVorhaben2.find(savedId);
+
+        daFactory2.beginTransaction();
+
+        assertEquals(savedId, vorhaben2.getId());
+        assertEquals("Mein zweiter Aufgabenplaner", vorhaben2.getTitel());
+        assertEquals("Meine zweite Aufgabe", vorhaben2.getBeschreibung());
+        assertEquals(Collections.emptyList(), vorhaben2.getTeile());
+        assertEquals(-999999, vorhaben2.getIstStunden());
+        assertEquals(-999999, vorhaben2.getRestStunden());
+        assertEquals(null, vorhaben2.getEndTermin());
+
+        daFactory2.endTransaction(true);
+    }
+
+    @Test
+    public void t050_DeleteEntityVorhaben() throws Exception {
+
+        // Entity Vorhaben löschen
+        final DaFactory daFactory = new DaFactoryForJPA();
+        final DaVorhaben daVorhaben = daFactory.getVorhabenDA();
+        final DmVorhaben vorhaben = daVorhaben.find(2L);
+
+
+        daFactory.beginTransaction();
+        daVorhaben.delete(vorhaben);
+
+        assertEquals(new Long(2L), vorhaben.getId());
+        assertEquals("Mein zweiter Aufgabenplaner", vorhaben.getTitel());
+        assertEquals("Meine zweite Aufgabe", vorhaben.getBeschreibung());
+        assertEquals(Collections.emptyList(), vorhaben.getTeile());
+        assertEquals(-999999, vorhaben.getIstStunden());
+        assertEquals(-999999, vorhaben.getRestStunden());
+        assertEquals(null, vorhaben.getEndTermin());
+
+        daFactory.endTransaction(true);
+
+        // Entity Vorhaben im Round-Trip-Verfahren lesen und prüfen
+        final DaFactory daFactory2 = new DaFactoryForJPA();
+        final DaVorhaben daVorhaben2 = daFactory2.getVorhabenDA();
+        final DmVorhaben vorhaben2 = daVorhaben2.find(2L);
+
+        daFactory2.beginTransaction();
+
+        assertEquals(null, vorhaben2);
+
+        daFactory2.endTransaction(true);
+    }
 
 }
