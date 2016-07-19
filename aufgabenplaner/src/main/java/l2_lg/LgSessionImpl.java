@@ -62,9 +62,6 @@ public class LgSessionImpl<A extends DmAufgabe> implements LgSession {
     @Override
     public void loeschen(final Long aufgabenId) throws DaGeneric.IdNotFoundExc, LoeschenTeileExc {
         final DmAufgabe entity = daAufgabe.find(aufgabenId);
-        if (entity == null) {
-            throw create(DaGeneric.IdNotFoundExc.class, entity);
-        }
         // Das Vorhaben mit ID {0} und Titel "{1}"
         // enthält noch {2} Teil(e) und kann daher nicht gelöscht werden!
         if (entity.getAnzahlTeile() != 0) {

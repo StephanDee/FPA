@@ -2,10 +2,7 @@ package platform;
 
 import l2_lg.LgSession;
 import l2_lg.LgSessionImpl;
-import l3_da.DaFactory;
-import l3_da.DaFactoryForJPA;
-import l3_da.DaGeneric;
-import l3_da.DaSchritt;
+import l3_da.*;
 import l4_dm.DmAufgabe;
 import l4_dm.DmAufgabeStatus;
 import l4_dm.DmSchritt;
@@ -106,12 +103,7 @@ public class LgSessionImplTest extends Assert {
         // Solche Rekursion ist verboten!
         final DaFactory daFactory = new DaFactoryForJPA();
         final LgSession lgSession = new LgSessionImpl(daFactory);
-        final DmVorhaben vorhaben = new DmVorhaben() {
-            @Override
-            public Long getId() {
-                return new Long(0L);
-            }
-        };
+        final DmVorhaben vorhaben = new DmVorhaben();
         vorhaben.setTitel("0123456789");
         vorhaben.setIstStunden(0);
         vorhaben.setRestStunden(0);
@@ -130,12 +122,8 @@ public class LgSessionImplTest extends Assert {
         // Session speichern
         final DaFactory daFactory = new DaFactoryForJPA();
         final LgSession lgSession = new LgSessionImpl(daFactory);
-        final DmVorhaben vorhaben = new DmVorhaben() {
-            @Override
-            public Long getId() {
-                return new Long(0L);
-            }
-        };
+        final DmVorhaben vorhaben = new DmVorhaben();
+
         vorhaben.setTitel("0123456789");
         vorhaben.setRestStunden(0);
         vorhaben.setIstStunden(0);
@@ -155,7 +143,7 @@ public class LgSessionImplTest extends Assert {
         final LgSession lgSession = new LgSessionImpl(daFactory);
 
         try {
-            lgSession.loeschen(11L);
+            lgSession.loeschen(99999L);
             fail("DaGeneric.IdNotFoundExc expected");
         } catch (DaGeneric.IdNotFoundExc expected) {}
     }
@@ -168,27 +156,22 @@ public class LgSessionImplTest extends Assert {
         // enthält noch {2} Teil(e) und kann daher nicht gelöscht werden!
         final DaFactory daFactory = new DaFactoryForJPA();
         final LgSession lgSession = new LgSessionImpl(daFactory);
-        final DmVorhaben vorhaben = new DmVorhaben() {
-            @Override
-            public Long getId() {
-                return new Long(2L);
-            }
-
+        final DmVorhaben vorhaben = new DmVorhaben(){
             @Override
             public int getAnzahlTeile() {
                 return 2;
             }
         };
-        assertEquals(new Long(2L), vorhaben.getId());
+        final Long savedId = vorhaben.getId();
+        assertEquals(new Long (1L), savedId);
+        assertEquals(2, vorhaben.getAnzahlTeile());
         vorhaben.setTitel("0123456789");
         vorhaben.setIstStunden(0);
         vorhaben.setRestStunden(0);
         vorhaben.setEndTermin(Date.valueOf("2018-01-01"));
-        assertEquals(new Long(2L), vorhaben.getId());
-        assertEquals(2, vorhaben.getAnzahlTeile());
 
         try {
-            lgSession.loeschen(vorhaben.getId());
+            lgSession.loeschen(savedId);
             fail("LgSession.LoeschenTeileExc expected");
         } catch (LgSession.LoeschenTeileExc expected) {}
     }
@@ -252,42 +235,10 @@ public class LgSessionImplTest extends Assert {
         // Alle obersten Aufgaben liefern
         final DaFactory daFactory = new DaFactoryForJPA();
         final LgSession lgSession = new LgSessionImpl(daFactory);
-        final DmSchritt schritt = new DmSchritt() {
-            @Override
-            public Long getId() {
-                return new Long(9L);
-            }
-        };
+        final DmSchritt schritt = new DmSchritt();
         schritt.setTitel("Oberste Aufgabe");
         schritt.setTitel("0123456789");
         schritt.setIstStunden(0);
-
-        final DmAufgabe aufgabe = new DmAufgabe() {
-            @Override
-            public int getRestStunden() {
-                return 0;
-            }
-
-            @Override
-            public int getIstStunden() {
-                return 0;
-            }
-
-            @Override
-            public int getAnzahlTeile() {
-                return 0;
-            }
-
-            @Override
-            public List<DmAufgabe> getTeile() {
-                return null;
-            }
-
-            @Override
-            public DmAufgabeStatus getStatus() {
-                return null;
-            }
-        };
 
         lgSession.alleOberstenAufgabenLiefern();
 

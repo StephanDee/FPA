@@ -1,9 +1,6 @@
 package platform;
 
-import l3_da.DaFactory;
-import l3_da.DaFactoryForJPA;
-import l3_da.DaSchritt;
-import l3_da.DaVorhaben;
+import l3_da.*;
 import l4_dm.DmAufgabeStatus;
 import l4_dm.DmSchritt;
 import l4_dm.DmVorhaben;
@@ -23,12 +20,23 @@ public class DaTest extends Assert {
     private static final DaFactory daFactory = new DaFactoryForJPA();
 
     @Test
+    public void t001_findEntityTest() throws Exception {
+
+        // Entity Schritt speichern
+        final DaSchritt daSchritt = daFactory.getSchrittDA();
+        try {
+            daSchritt.find(999999L);
+            fail("DaGeneric.IdNotFoundExc expected");
+        } catch (DaGeneric.IdNotFoundExc expected) {}
+    }
+
+    @Test
     public void t010_SaveEntitySchritt() throws Exception {
 
         // Entity Schritt speichern
         final DaSchritt daSchritt = daFactory.getSchrittDA();
-        assertNull(daSchritt.find(1L));
         final DmSchritt schritt = new DmSchritt();
+
         schritt.setTitel("Mein Aufgabenplaner");
         schritt.setBeschreibung("Meine Aufgabe");
         schritt.getTeile();
@@ -41,10 +49,12 @@ public class DaTest extends Assert {
         daSchritt.save(schritt);
         daFactory.endTransaction(true);
 
+        final Long savedId = schritt.getId();
+
         // Entity Schritt im Round-Trip-Verfahren lesen und prüfen
         final DaFactory daFactory2 = new DaFactoryForJPA();
         final DaSchritt daSchritt2 = daFactory2.getSchrittDA();
-        final DmSchritt schritt2 = daSchritt2.find(1L);
+        final DmSchritt schritt2 = daSchritt2.find(savedId);
 
         daFactory2.beginTransaction();
 
@@ -68,6 +78,7 @@ public class DaTest extends Assert {
         final DaFactory daFactory = new DaFactoryForJPA();
         final DaSchritt daSchritt = daFactory.getSchrittDA();
         final DmSchritt schritt = daSchritt.find(1L);
+
         schritt.setTitel("Mein erster Aufgabenplaner");
         schritt.setBeschreibung("Meine erste Aufgabe");
         schritt.getTeile();
@@ -80,10 +91,12 @@ public class DaTest extends Assert {
         daSchritt.save(schritt);
         daFactory.endTransaction(true);
 
+        final Long savedId = schritt.getId();
+
         // Entity Schritt im Round-Trip-Verfahren lesen und prüfen
         final DaFactory daFactory2 = new DaFactoryForJPA();
         final DaSchritt daSchritt2 = daFactory2.getSchrittDA();
-        final DmSchritt schritt2 = daSchritt2.find(1L);
+        final DmSchritt schritt2 = daSchritt2.find(savedId);
 
         daFactory2.beginTransaction();
 
@@ -111,15 +124,15 @@ public class DaTest extends Assert {
         daSchritt.delete(schritt);
         daFactory.endTransaction(true);
 
+        final Long savedId = schritt.getId();
+
         // Entity Schritt im Round-Trip-Verfahren lesen und prüfen
         final DaFactory daFactory2 = new DaFactoryForJPA();
         final DaSchritt daSchritt2 = daFactory2.getSchrittDA();
-        final DmSchritt schritt2 = daSchritt2.find(1L);
+        final DmSchritt schritt2 = daSchritt2.find(savedId);
 
         daFactory2.beginTransaction();
-
         assertEquals(null, schritt2);
-
         daFactory2.endTransaction(true);
 
     }
@@ -184,15 +197,15 @@ public class DaTest extends Assert {
 
         daFactory.endTransaction(true);
 
+        final Long savedId = vorhaben.getId();
+
         // Entity Vorhaben im Round-Trip-Verfahren lesen und prüfen
         final DaFactory daFactory2 = new DaFactoryForJPA();
         final DaVorhaben daVorhaben2 = daFactory2.getVorhabenDA();
-        final DmVorhaben vorhaben2 = daVorhaben2.find(2L);
+        final DmVorhaben vorhaben2 = daVorhaben2.find(savedId);
 
         daFactory2.beginTransaction();
-
         assertEquals(null, vorhaben2);
-
         daFactory2.endTransaction(true);
     }
 

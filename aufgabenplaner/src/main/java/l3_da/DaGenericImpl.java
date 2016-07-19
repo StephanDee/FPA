@@ -6,6 +6,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
+import static multex.MultexUtil.create;
+
 /**
  * Created by Stephan D on 08.06.2016.
  */
@@ -37,7 +39,11 @@ public class DaGenericImpl<E extends DmAufgabe> implements DaGeneric<E> {
 
     @Override
     public E find(Long id) throws IdNotFoundExc {
-        return (manager.find(managedClass, id));
+        final E result = manager.find(managedClass, id);
+        if (result == null) {
+            throw create(DaGeneric.IdNotFoundExc.class, managedClass.getSimpleName(), id);
+        }
+        return result;
     }
 
     @Override
