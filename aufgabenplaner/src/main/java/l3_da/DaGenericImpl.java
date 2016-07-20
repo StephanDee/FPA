@@ -48,7 +48,7 @@ public class DaGenericImpl<E extends DmAufgabe> implements DaGeneric<E> {
 
     @Override
     public List<E> findAll() {
-        final TypedQuery<E> query = manager.createQuery("Find All", this.managedClass);
+        final TypedQuery<E> query = manager.createQuery("SELECT o FROM " + managedClass.getName() + " o ORDER BY id DESC", this.managedClass);
         return query.getResultList();
     }
 

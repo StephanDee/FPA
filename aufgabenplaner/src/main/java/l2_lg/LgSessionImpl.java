@@ -16,11 +16,12 @@ import static multex.MultexUtil.create;
  */
 public class LgSessionImpl<A extends DmAufgabe> implements LgSession {
 
-    private DaFactory daFactory = new DaFactoryForJPA();
-    private final DaAufgabe daAufgabe = daFactory.getAufgabeDA();
+    private final DaFactory daFactory;
+    private final DaAufgabe daAufgabe;
 
     public LgSessionImpl(final DaFactory daFactory) {
         this.daFactory = daFactory;
+        this.daAufgabe = daFactory.getAufgabeDA();
     }
 
     @Override
@@ -47,7 +48,6 @@ public class LgSessionImpl<A extends DmAufgabe> implements LgSession {
                 throw create(EndTerminExc.class, vorhaben.getEndTermin());
             pruefenVorhabenRekursion(vorhaben, vorhaben.getGanzes());
         }
-        //TODO Redundanzfreie Transaktionsbegleitung
         new Template() {
 
             @Override
@@ -64,8 +64,14 @@ public class LgSessionImpl<A extends DmAufgabe> implements LgSession {
         final DmAufgabe entity = daAufgabe.find(aufgabenId);
         // Das Vorhaben mit ID {0} und Titel "{1}"
         // enthält noch {2} Teil(e) und kann daher nicht gelöscht werden!
-        if (entity.getAnzahlTeile() != 0) {
-            throw create(LoeschenTeileExc.class, entity, entity.getTitel(), entity.getAnzahlTeile());
+
+        //TODO alle Aufgaben in einer Schleife durchlaufen und jede Aufgabe überprüfen
+        final List<DmAufgabe> alleAufgaben = daAufgabe.findAll();
+        for (final DmAufgabe dmAufgabe : alleAufgaben) {
+            final DmVorhaben ganzes = dmAufgabe.getGanzes();
+            if (ganzes == entity) {
+                throw create(LoeschenTeileExc.class, entity, entity.getTitel(), entity.getAnzahlTeile());
+            }
         }
         new Template() {
             @Override
@@ -88,8 +94,8 @@ public class LgSessionImpl<A extends DmAufgabe> implements LgSession {
         }
         schritt.setRestStunden(0);
         schritt.setErledigtZeitpunkt(new java.sql.Date(System.currentTimeMillis()));
-        //TODO speichern aufrufen
-        //TODO Transaktion
+        // speichern aufrufen
+        // Transaktion
         speichern(schritt);
         return schritt;
     }
@@ -139,12 +145,13 @@ public class LgSessionImpl<A extends DmAufgabe> implements LgSession {
     // ist seinerseits direkt oder indirekt Teil dieser Aufgabe mit ID {2}.
     // Solche Rekursion ist verboten!
     private void pruefenVorhabenRekursion(final DmVorhaben verboten, final DmVorhaben aktuell) {
-        if (verboten == aktuell)
+        if (aktuell == verboten)
             throw create(VorhabenRekursionExc.class, verboten.getId(), verboten.getTitel());
+        if (aktuell == null) return;
         pruefenVorhabenRekursion(verboten, aktuell.getGanzes());
     }
 
-    //TODO Ist-Stunden aller Unterknoten rekursiv aufsummieren
+    // Ist-Stunden aller Unterknoten rekursiv aufsummieren
     private int istStundenSumme(final DmVorhaben dmVorhaben) {
         int result = 0;
         for (final DmAufgabe dmAufgabe : dmVorhaben.getTeile()) {
@@ -157,7 +164,7 @@ public class LgSessionImpl<A extends DmAufgabe> implements LgSession {
         return result;
     }
 
-    //TODO Rest-Stunden aller Unterknoten rekursiv aufsummieren
+    // Rest-Stunden aller Unterknoten rekursiv aufsummieren
     private int restStundenSumme(final DmVorhaben dmVorhaben) {
         int result = 0;
         for (final DmAufgabe dmAufgabe : dmVorhaben.getTeile()) {

@@ -53,7 +53,7 @@ public class DaFactoryForJPA implements DaFactory {
                 transaction.rollback();
             }
         } finally { //wird auch bei Erfolg oder return ausgeführt!
-            em.close();
+            em.clear();
         }
     }
 }

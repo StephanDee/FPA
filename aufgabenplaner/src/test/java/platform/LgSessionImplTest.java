@@ -3,8 +3,6 @@ package platform;
 import l2_lg.LgSession;
 import l2_lg.LgSessionImpl;
 import l3_da.*;
-import l4_dm.DmAufgabe;
-import l4_dm.DmAufgabeStatus;
 import l4_dm.DmSchritt;
 import l4_dm.DmVorhaben;
 import org.junit.Assert;
@@ -13,8 +11,6 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.sql.Date;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by Stephan D on 06.06.2016.
@@ -156,20 +152,22 @@ public class LgSessionImplTest extends Assert {
         // enthält noch {2} Teil(e) und kann daher nicht gelöscht werden!
         final DaFactory daFactory = new DaFactoryForJPA();
         final LgSession lgSession = new LgSessionImpl(daFactory);
-        final DmVorhaben vorhaben = new DmVorhaben(){
-            @Override
-            public int getAnzahlTeile() {
-                return 2;
-            }
-        };
-        final Long savedId = vorhaben.getId();
-        assertEquals(new Long (1L), savedId);
-        assertEquals(2, vorhaben.getAnzahlTeile());
+        final DmVorhaben vorhaben = new DmVorhaben();
         vorhaben.setTitel("0123456789");
         vorhaben.setIstStunden(0);
         vorhaben.setRestStunden(0);
         vorhaben.setEndTermin(Date.valueOf("2018-01-01"));
+        lgSession.speichern(vorhaben);
 
+        final DmSchritt schritt = new DmSchritt();
+        schritt.setGanzes(vorhaben);
+        schritt.setTitel("012345678901");
+        vorhaben.setIstStunden(0);
+        vorhaben.setRestStunden(0);
+        lgSession.speichern(schritt);
+
+        final Long savedId = vorhaben.getId();
+        assertEquals(new Long (1L), savedId);
         try {
             lgSession.loeschen(savedId);
             fail("LgSession.LoeschenTeileExc expected");
@@ -237,25 +235,18 @@ public class LgSessionImplTest extends Assert {
         final LgSession lgSession = new LgSessionImpl(daFactory);
         final DmSchritt schritt = new DmSchritt();
         schritt.setTitel("Oberste Aufgabe");
-        schritt.setTitel("0123456789");
+        schritt.setBeschreibung("0123456789");
         schritt.setIstStunden(0);
+
+        lgSession.speichern(schritt);
+        final Long savedId = schritt.getId();
 
         lgSession.alleOberstenAufgabenLiefern();
 
-        // Entity Schritt im Round-Trip-Verfahren lesen und prüfen
-//        final DaFactory daFactory2 = new DaFactoryForJPA();
-//        final DaSchritt daSchritt2 = daFactory2.getSchrittDA();
-//        final DmSchritt schritt2 = daSchritt2.find(9L);
-//
-//        daFactory2.beginTransaction();
-//
-//        assertEquals(new Long(1L), schritt2.getId());
-//        assertEquals("Oberste Aufgabe", schritt2.getTitel());
-//        assertEquals("0123456789", schritt2.getBeschreibung());
-//        assertEquals(0, schritt2.getIstStunden());
-//        // assertEquals(DmAufgabeStatus.valueOf("inBearbeitung"), schritt2.getStatus());
-//
-//        daFactory2.endTransaction(true);
+        assertEquals(new Long(3L), schritt.getId());
+        assertEquals("Oberste Aufgabe", schritt.getTitel());
+        assertEquals("0123456789", schritt.getBeschreibung());
+        assertEquals(0, schritt.getIstStunden());
     }
 
     @Test
@@ -265,10 +256,70 @@ public class LgSessionImplTest extends Assert {
         final DaFactory daFactory = new DaFactoryForJPA();
         final LgSession lgSession = new LgSessionImpl(daFactory);
         final DmVorhaben vorhaben = new DmVorhaben();
-        vorhaben.setTitel("Oberste Aufgabe");
-        vorhaben.setTitel("0123456789");
+        vorhaben.setTitel("Mein Vorhaben");
+        vorhaben.setBeschreibung("0123456789");
         vorhaben.setIstStunden(0);
+        vorhaben.setRestStunden(0);
+        vorhaben.setEndTermin(Date.valueOf("2020-08-01"));
+
+        lgSession.speichern(vorhaben);
+        final Long savedId = vorhaben.getId();
+        assertEquals(new Long (4L), savedId);
 
         lgSession.alleVorhabenLiefern();
+
+        assertEquals(new Long(4L), vorhaben.getId());
+        assertEquals("Mein Vorhaben", vorhaben.getTitel());
+        assertEquals("0123456789", vorhaben.getBeschreibung());
+        assertEquals(0, vorhaben.getIstStunden());
+        assertEquals(0, vorhaben.getRestStunden());
+        assertEquals(Date.valueOf("2020-08-01"), vorhaben.getEndTermin());
+    }
+
+    @Test
+    public void t140_SpeichernTest() throws Exception {
+        // Session speichern
+        final DaFactory daFactory = new DaFactoryForJPA();
+        final LgSession lgSession = new LgSessionImpl(daFactory);
+        final DmSchritt schritt = new DmSchritt();
+        schritt.setTitel("MeinSpeichernTest");
+
+        lgSession.speichern(schritt);
+
+        final Long savedId = schritt.getId();
+        assertEquals(new Long(5L), savedId);
+        assertEquals("MeinSpeichernTest", schritt.getTitel());
+    }
+
+    @Test
+    public void t150_ErledigenTest() throws Exception {
+        // Session speichern
+        final DaFactory daFactory = new DaFactoryForJPA();
+        final LgSession lgSession = new LgSessionImpl(daFactory);
+        final DmSchritt schritt = new DmSchritt();
+        schritt.setTitel("MeinErledigenTest");
+
+        lgSession.erledigen(schritt);
+
+        final Long savedId = schritt.getId();
+        assertEquals(new Long(6L), savedId);
+        assertEquals("MeinErledigenTest", schritt.getTitel());
+    }
+
+    @Test
+    public void t160_LoeschenTest() throws Exception {
+        // Session speichern
+        final DaFactory daFactory = new DaFactoryForJPA();
+        final LgSession lgSession = new LgSessionImpl(daFactory);
+        final DmSchritt schritt = new DmSchritt();
+        schritt.setTitel("MeinLoeschenTest");
+        lgSession.speichern(schritt);
+        final Long savedId = schritt.getId();
+        assertEquals("MeinLoeschenTest", schritt.getTitel());
+        assertEquals(new Long(7L), savedId);
+
+        lgSession.loeschen(savedId);
+
+        assertEquals(new Long (7L), schritt.getId());
     }
 }
