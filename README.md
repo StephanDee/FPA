@@ -1,2 +1,2 @@
 # FPA
-Fortgeschrittene Programmier Architekturkonzepte
+Fortgeschrittene Programmier Architekturkonzepte / SS16 / Dozent: Cristoph Knabe
